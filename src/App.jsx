@@ -4,15 +4,8 @@ import supabase from "./supabase.js";
 import { MODES, MODE_KEYS } from "./prompts.js";
 
 const C = {
-  bg: "#121218",
-  bg2: "#181820",
-  bg3: "#1e1e28",
-  border: "#252530",
-  accent: "#2dd4bf",
-  accentDim: "#1a8a7a",
-  text: "#e8e8f0",
-  textDim: "#8888a0",
-  textMuted: "#555566",
+  bg: "#121218", bg2: "#181820", bg3: "#1e1e28", border: "#252530",
+  accent: "#2dd4bf", text: "#e8e8f0", textDim: "#8888a0", textMuted: "#555566",
 };
 
 const FaceLogo = ({ size = 48 }) => (
@@ -22,19 +15,17 @@ const FaceLogo = ({ size = 48 }) => (
 );
 
 const Disclaimer = ({ onAccept }) => (
-  <div style={DS.overlay}>
-    <div style={DS.box}>
-      <FaceLogo size={40} />
-      <h2 style={DS.title}>KaraPsiko</h2>
-      <div style={DS.text}>
-        <p>Bu uygulama bir <strong style={{ color: C.text }}>psikolojik danışmanlık, terapi veya tıbbi destek hizmeti değildir.</strong></p>
-        <p>KaraPsiko yalnızca iletişim stratejileri, müzakere teknikleri ve sosyal dinamikler hakkında bilgi ve öneri sunar.</p>
-        <p>Psikolojik sorunlar yaşıyorsanız lütfen bir ruh sağlığı uzmanına başvurunuz.</p>
-        <p style={{ color: C.textMuted, fontSize: 11, marginTop: 12 }}>Devam ederek bu koşulları kabul etmiş olursunuz.</p>
-      </div>
-      <button onClick={onAccept} style={DS.btn}>Okudum, Anladım</button>
+  <div style={DS.overlay}><div style={DS.box}>
+    <FaceLogo size={40} />
+    <h2 style={DS.title}>KaraPsiko</h2>
+    <div style={DS.text}>
+      <p>Bu uygulama bir <strong style={{ color: C.text }}>psikolojik danışmanlık, terapi veya tıbbi destek hizmeti değildir.</strong></p>
+      <p>KaraPsiko yalnızca iletişim stratejileri, müzakere teknikleri ve sosyal dinamikler hakkında bilgi ve öneri sunar.</p>
+      <p>Psikolojik sorunlar yaşıyorsanız lütfen bir ruh sağlığı uzmanına başvurunuz.</p>
+      <p style={{ color: C.textMuted, fontSize: 11, marginTop: 12 }}>Devam ederek bu koşulları kabul etmiş olursunuz.</p>
     </div>
-  </div>
+    <button onClick={onAccept} style={DS.btn}>Okudum, Anladım</button>
+  </div></div>
 );
 
 const DS = {
@@ -62,6 +53,9 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [streaming, setStreaming] = useState("");
   const [qc, setQc] = useState(0);
+  const [convos, setConvos] = useState([]);
+  const [activeConvo, setActiveConvo] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
   const MX = CONFIG.FREE_LIMIT;
   const eRef = useRef(null);
   const tRef = useRef(null);
@@ -86,6 +80,8 @@ export default function App() {
 
   useEffect(() => { if (token) sessionStorage.setItem("kp_token", token); }, [token]);
   useEffect(() => { eRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, busy, streaming]);
+  useEffect(() => { if (user && token) { supabase.getConversations(user.id, token).then(data => { if (Array.isArray(data)) setConvos(data); }).catch(() => {}); } }, [user, token]);
+
   const rsz = useCallback(() => { const t = tRef.current; if (t) { t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 150) + "px"; } }, []);
 
   const handleAuth = async () => {
@@ -101,7 +97,18 @@ export default function App() {
     setAuthLoading(false);
   };
 
-  const handleLogout = () => { setUser(null); setToken(null); setMode(null); setMsgs([]); sessionStorage.removeItem("kp_token"); };
+  const handleLogout = () => { setUser(null); setToken(null); setMode(null); setMsgs([]); setActiveConvo(null); setConvos([]); sessionStorage.removeItem("kp_token"); };
+
+  const loadConvo = (conv) => { setMode(conv.mode); setMsgs(conv.messages || []); setActiveConvo(conv.id); setShowHistory(false); };
+
+  const newChat = () => { setMsgs([]); setActiveConvo(null); };
+
+  const deleteConvo = async (convId, e) => {
+    e.stopPropagation();
+    await supabase.deleteConversation(convId, token);
+    setConvos(prev => prev.filter(c => c.id !== convId));
+    if (activeConvo === convId) { setMsgs([]); setActiveConvo(null); }
+  };
 
   const send = async () => {
     if (!inp.trim() || busy || !mode) return;
@@ -120,17 +127,30 @@ export default function App() {
       const decoder = new TextDecoder();
       let acc = "", buf = "";
       while (true) { const { done, value } = await reader.read(); if (done) break; buf += decoder.decode(value, { stream: true }); const lines = buf.split("\n"); buf = lines.pop() || ""; for (const line of lines) { if (!line.startsWith("data: ")) continue; const data = line.slice(6).trim(); if (data === "[DONE]") continue; try { const p = JSON.parse(data); if (p.type === "content_block_delta" && p.delta?.type === "text_delta") { acc += p.delta.text; setStreaming(acc); } } catch {} } }
-      if (acc) { setMsgs(prev => [...prev, { role: "assistant", content: acc }]); const nc = qc + 1; setQc(nc); if (user && token) supabase.updateQueryCount(user.id, nc, token).catch(() => {}); }
-      else { setMsgs(prev => [...prev, { role: "assistant", content: "Yanıt alınamadı." }]); }
+      if (acc) {
+        const finalMsgs = [...all, { role: "assistant", content: acc }];
+        setMsgs(finalMsgs);
+        const nc = qc + 1; setQc(nc);
+        if (user && token) { supabase.updateQueryCount(user.id, nc, token).catch(() => {}); }
+        const title = um.content.slice(0, 50) + (um.content.length > 50 ? "..." : "");
+        if (activeConvo) {
+          await supabase.updateConversation(activeConvo, finalMsgs, title, token);
+          setConvos(prev => prev.map(c => c.id === activeConvo ? { ...c, messages: finalMsgs, title, updated_at: new Date().toISOString() } : c));
+        } else {
+          const newConv = await supabase.createConversation(user.id, mode, title, finalMsgs, token);
+          if (newConv) { setActiveConvo(newConv.id); setConvos(prev => [newConv, ...prev]); }
+        }
+      } else { setMsgs(prev => [...prev, { role: "assistant", content: "Yanıt alınamadı." }]); }
       setStreaming("");
     } catch (e) { setStreaming(""); setMsgs(p => [...p, { role: "assistant", content: e.name === "AbortError" ? "Zaman aşımı." : e.message }]); }
     setBusy(false);
   };
 
-  const pick = m => { setMode(m); setMsgs([]); setStreaming(""); };
+  const pick = m => { setMode(m); setMsgs([]); setActiveConvo(null); setStreaming(""); setShowHistory(false); };
   const openShopier = () => { const url = user?.email ? CONFIG.SHOPIER_URL + "?email=" + encodeURIComponent(user.email) : CONFIG.SHOPIER_URL; window.open(url, "_blank"); };
   const renderText = (txt) => txt.split("\n").map((ln, j) => { const hd = /^(\d+\.)?\s*[A-ZÇĞİÖŞÜ\s]{4,}/.test(ln.trim()); return <p key={j} style={{ margin: "0 0 5px", fontWeight: hd ? 700 : 400, color: hd ? C.accent : "#c8c8d8", fontSize: hd ? 12.5 : 13.5, letterSpacing: hd ? 1 : 0 }}>{ln || "\u00A0"}</p>; });
   const limitReached = !isPro && qc >= MX;
+  const modeConvos = convos.filter(c => c.mode === mode);
 
   if (initializing) return (<div style={{ ...S.root, alignItems: "center", justifyContent: "center" }}><FaceLogo size={48} /><style>{CSS}</style></div>);
   if (!disclaimerAccepted) return (<div style={S.root}><Disclaimer onAccept={acceptDisclaimer} /><style>{CSS}</style></div>);
@@ -162,7 +182,42 @@ export default function App() {
   const c = MODES[mode];
   return (
     <div style={S.root}>
-      <div style={S.hdr}><button onClick={() => { setMode(null); setMsgs([]); }} style={S.bk}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button><div style={S.hc}><FaceLogo size={22} /><span style={S.ht}>{c.label}</span></div><div style={{ width: 34 }} /></div>
+      <div style={S.hdr}>
+        <button onClick={() => { setMode(null); setMsgs([]); setActiveConvo(null); }} style={S.bk}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <div style={S.hc}><FaceLogo size={22} /><span style={S.ht}>{c.label}</span></div>
+        <div style={{ display: "flex", gap: 4 }}>
+          <button onClick={newChat} style={S.iconBtn} title="Yeni sohbet">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.accent} strokeWidth="2" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button onClick={() => setShowHistory(!showHistory)} style={S.iconBtn} title="Geçmiş">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={modeConvos.length > 0 ? C.accent : C.textMuted} strokeWidth="2" strokeLinecap="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+          </button>
+        </div>
+      </div>
+
+      {showHistory && (
+        <div style={S.histPanel}>
+          <div style={S.histHeader}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: C.text, letterSpacing: 1 }}>Sohbet Geçmişi</span>
+            <button onClick={() => setShowHistory(false)} style={S.iconBtn}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          {modeConvos.length === 0 && <p style={{ fontSize: 12, color: C.textMuted, textAlign: "center", padding: 20 }}>Henüz sohbet yok.</p>}
+          {modeConvos.map(conv => (
+            <div key={conv.id} onClick={() => loadConvo(conv)} style={{ ...S.histItem, borderColor: conv.id === activeConvo ? C.accent : C.border }}>
+              <div style={{ flex: 1, overflow: "hidden" }}>
+                <p style={{ margin: 0, fontSize: 12, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{conv.title || "Sohbet"}</p>
+                <p style={{ margin: "2px 0 0", fontSize: 10, color: C.textMuted }}>{new Date(conv.updated_at).toLocaleDateString("tr-TR")}</p>
+              </div>
+              <button onClick={(e) => deleteConvo(conv.id, e)} style={{ ...S.iconBtn, padding: 4 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e74c3c" strokeWidth="2" strokeLinecap="round"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div style={S.tb}>{MODE_KEYS.map(k => (<button key={k} onClick={() => pick(k)} style={{ ...S.tbn, color: k === mode ? C.text : C.textMuted, borderBottomColor: k === mode ? C.accent : "transparent" }}>{MODES[k].label}</button>))}</div>
       <div style={S.ca}>
         {msgs.length === 0 && !streaming && <div style={S.emp}><FaceLogo size={44} /><p style={S.et}>{c.desc}</p></div>}
@@ -214,6 +269,10 @@ const S = {
   bk:{background:"none",border:"none",cursor:"pointer",padding:"4px 6px",display:"flex",alignItems:"center"},
   hc:{display:"flex",alignItems:"center",gap:7},
   ht:{fontSize:12,fontWeight:700,letterSpacing:2.5,color:"#e8e8f0"},
+  iconBtn:{background:"none",border:"none",cursor:"pointer",padding:"4px 6px",display:"flex",alignItems:"center"},
+  histPanel:{background:"#181820",borderBottom:"1px solid #252530",maxHeight:"50vh",overflowY:"auto",padding:"8px 12px"},
+  histHeader:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8},
+  histItem:{display:"flex",alignItems:"center",gap:8,padding:"10px 12px",borderRadius:8,border:"1px solid #252530",marginBottom:6,cursor:"pointer",transition:"all .2s"},
   tb:{display:"flex",borderBottom:"1px solid #252530",background:"#121218",overflowX:"auto"},
   tbn:{flex:"0 0 auto",padding:"9px 12px",background:"none",border:"none",borderBottom:"2px solid transparent",fontSize:10,fontWeight:600,letterSpacing:1,cursor:"pointer",transition:"all .2s",textAlign:"center",whiteSpace:"nowrap"},
   ca:{flex:1,overflowY:"auto",padding:"14px 12px",display:"flex",flexDirection:"column",gap:10},
