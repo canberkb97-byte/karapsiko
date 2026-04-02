@@ -174,6 +174,21 @@ export default function App() {
       <div style={S.ub2}><span style={S.ue}>{user.email}</span><div style={{ display: "flex", gap: 8, alignItems: "center" }}>{isPro && <span style={S.pb2}>PRO</span>}<button onClick={handleLogout} style={S.lo}>Çıkış</button></div></div>
       <div style={S.brand}><FaceLogo size={68} /><div style={{ height: 18 }} /><h1 style={S.title}>KARAPSİKO</h1><p style={S.sub}>GÖLGE DANIŞMAN</p><div style={S.line} /><p style={S.tag}>Gücü elinde tut.</p></div>
       <div style={S.grid}>{MODE_KEYS.map(k => (<button key={k} onClick={() => pick(k)} style={S.card} onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; e.currentTarget.style.background = "#1a1a24"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bg2; }}><span style={S.cn}>{MODES[k].label}</span><span style={S.cd}>{MODES[k].desc}</span></button>))}</div>
+      {convos.length > 0 && (
+        <div style={{ width: "100%", maxWidth: 380 }}>
+          <p style={{ fontSize: 11, color: C.textMuted, letterSpacing: 2, fontWeight: 600, marginBottom: 8 }}>SON SOHBETLER</p>
+          {convos.slice(0, 5).map(conv => (
+            <div key={conv.id} onClick={() => loadConvo(conv)} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: C.bg2, border: "1px solid " + C.border, borderRadius: 8, marginBottom: 6, cursor: "pointer", transition: "all .2s" }} onMouseEnter={e => { e.currentTarget.style.borderColor = C.accent; }} onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: C.accent, flexShrink: 0 }} />
+              <div style={{ flex: 1, overflow: "hidden" }}>
+                <p style={{ margin: 0, fontSize: 12, color: C.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{conv.title || "Sohbet"}</p>
+                <p style={{ margin: "2px 0 0", fontSize: 10, color: C.textMuted }}>{MODES[conv.mode]?.label || conv.mode} — {new Date(conv.updated_at).toLocaleDateString("tr-TR")}</p>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={C.textMuted} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+          ))}
+        </div>
+      )}
       {!isPro && <div style={S.usg}><span style={S.ul}>{qc}/{MX}</span><div style={S.ut}><div style={{ ...S.uf, width: Math.min((qc/MX)*100,100) + "%" }} /></div>{limitReached && <button onClick={openShopier} style={S.pb}>PRO — {CONFIG.PRO_PRICE}</button>}</div>}
       {isPro && <p style={{ fontSize: 11, color: C.textMuted, letterSpacing: 2 }}>PRO — SINIRSIZ ERİŞİM</p>}
     </div><style>{CSS}</style></div>
