@@ -165,12 +165,17 @@ export default function App() {
         <button onClick={handleAuth} disabled={authLoading} style={S.ab}>{authLoading ? "..." : authView === "login" ? "Giriş Yap" : "Kayıt Ol"}</button>
        <button onClick={() => supabase.signInWithGoogle()} style={S.gb}>Google ile Giriş</button>
         <button onClick={() => { setAuthView(authView === "login" ? "signup" : "login"); setAuthErr(""); }} style={S.at2}>{authView === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var? Giriş yap"}</button>
-        <div style={{ marginTop: 16, display: "flex", gap: 16, justifyContent: "center" }}>
-          <a href="/privacy.html" target="_blank" style={{ color: "#555566", fontSize: 11, textDecoration: "none" }}>Gizlilik Politikası</a>
-          <span style={{ color: "#252530" }}>|</span>
-          <a href="mailto:obscurapsy@gmail.com" style={{ color: "#555566", fontSize: 11, textDecoration: "none" }}>İletişim</a>
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", gap: 16 }}>
+            <a href="https://www.tiktok.com/@karapsiko" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>TikTok</a>
+            <a href="https://www.instagram.com/karapsiko" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>Instagram</a>
+            <a href="https://www.shopier.com/karapsy/45589888" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>E-Kitap</a>
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <a href="/privacy.html" target="_blank" style={{ color: "#555566", fontSize: 10, textDecoration: "none" }}>Gizlilik Politikası</a>
+            <a href="/about.html" target="_blank" style={{ color: "#555566", fontSize: 10, textDecoration: "none" }}>Hakkımızda</a>
+          </div>
         </div>
-      </div>
     </div><style>{CSS}</style></div>
   );
 
@@ -196,6 +201,12 @@ export default function App() {
       )}
       {!isPro && <div style={S.usg}><span style={S.ul}>{qc}/{MX}</span><div style={S.ut}><div style={{ ...S.uf, width: Math.min((qc/MX)*100,100) + "%" }} /></div>{limitReached && <button onClick={openShopier} style={S.pb}>PRO — {CONFIG.PRO_PRICE}</button>}</div>}
       {isPro && <p style={{ fontSize: 11, color: C.textMuted, letterSpacing: 2 }}>PRO — SINIRSIZ ERİŞİM</p>}
+       <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
+        <a href="https://www.tiktok.com/@karapsiko" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>TikTok</a>
+        <a href="https://www.instagram.com/karapsiko" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>Instagram</a>
+        <a href="https://www.shopier.com/karapsy/45589888" target="_blank" style={{ color: "#2dd4bf", fontSize: 11, textDecoration: "none" }}>E-Kitap</a>
+        <a href="/about.html" target="_blank" style={{ color: "#555566", fontSize: 11, textDecoration: "none" }}>Hakkımızda</a>
+      </div>
     </div><style>{CSS}</style></div>
   );
 
