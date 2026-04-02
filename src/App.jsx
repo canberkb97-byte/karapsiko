@@ -266,7 +266,20 @@ export default function App() {
   );
 }
 
-const CSS = "@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');*{box-sizing:border-box}.kd{display:inline-block;width:5px;height:5px;border-radius:50%;background:#2dd4bf}.kd1{animation:kp 1.4s infinite 0s}.kd2{animation:kp 1.4s infinite .15s}.kd3{animation:kp 1.4s infinite .3s}@keyframes kp{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1.3)}}@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}textarea::placeholder,input::placeholder{color:#555566}::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#252530;border-radius:3px}";
+const CSS = `
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+*{box-sizing:border-box}
+.kd{display:inline-block;width:5px;height:5px;border-radius:50%;background:#2dd4bf}
+.kd1{animation:kp 1.4s infinite 0s}
+.kd2{animation:kp 1.4s infinite .15s}
+.kd3{animation:kp 1.4s infinite .3s}
+@keyframes kp{0%,80%,100%{opacity:.2;transform:scale(.8)}40%{opacity:1;transform:scale(1.3)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+textarea::placeholder,input::placeholder{color:#555566}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#252530;border-radius:3px}
+`;
 
 const S = {
   root:{width:"100%",height:"100vh",background:"#121218",display:"flex",flexDirection:"column",fontFamily:"'DM Sans',sans-serif",color:"#e8e8f0",overflow:"hidden"},
