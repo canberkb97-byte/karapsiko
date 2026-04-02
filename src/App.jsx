@@ -22,7 +22,7 @@ const Disclaimer = ({ onAccept }) => (
       <p>Bu uygulama bir <strong style={{ color: C.text }}>psikolojik danışmanlık, terapi veya tıbbi destek hizmeti değildir.</strong></p>
       <p>KaraPsiko yalnızca iletişim stratejileri, müzakere teknikleri ve sosyal dinamikler hakkında bilgi ve öneri sunar.</p>
       <p>Psikolojik sorunlar yaşıyorsanız lütfen bir ruh sağlığı uzmanına başvurunuz.</p>
-      <p style={{ color: C.textMuted, fontSize: 11, marginTop: 12 }}>Devam ederek bu koşulları kabul etmiş olursunuz.</p>
+      <p style={{ color: C.textMuted, fontSize: 11, marginTop: 12 }}><p style={{ color: C.textMuted, fontSize: 11, marginTop: 12 }}>Devam ederek <a href="/terms.html" target="_blank" style={{ color: C.accent, textDecoration: "none" }}>Kullanım Koşulları</a>'nı kabul etmiş olursunuz.</p> kabul etmiş olursunuz.</p>
     </div>
     <button onClick={onAccept} style={DS.btn}>Okudum, Anladım</button>
   </div></div>
@@ -44,7 +44,7 @@ const SocialLinks = ({ small }) => (
       <a href="https://www.shopier.com/karapsy/44133638" target="_blank" style={{ color: C.accent, fontSize: 11, textDecoration: "none" }}>E-Kitap</a>
     </div>
     <div style={{ display: "flex", gap: 12 }}>
-      <a href="/privacy.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Gizlilik Politikası</a>
+      <a href="/privacy.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}><a href="/terms.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Kullanım Koşulları</a>
       <a href="/about.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Hakkımızda</a>
     </div>
   </div>
