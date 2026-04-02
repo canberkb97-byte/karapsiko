@@ -163,8 +163,13 @@ export default function App() {
         <input type="password" placeholder="Şifre (min 6 karakter)" value={authPass} onChange={e => setAuthPass(e.target.value)} onKeyDown={e => { if (e.key === "Enter") handleAuth(); }} style={S.ai} />
         {authErr && <p style={S.ae}>{authErr}</p>}
         <button onClick={handleAuth} disabled={authLoading} style={S.ab}>{authLoading ? "..." : authView === "login" ? "Giriş Yap" : "Kayıt Ol"}</button>
-        <button onClick={() => supabase.signInWithGoogle()} style={S.gb}>Google ile Giriş</button>
+       <button onClick={() => supabase.signInWithGoogle()} style={S.gb}>Google ile Giriş</button>
         <button onClick={() => { setAuthView(authView === "login" ? "signup" : "login"); setAuthErr(""); }} style={S.at2}>{authView === "login" ? "Hesabın yok mu? Kayıt ol" : "Zaten hesabın var? Giriş yap"}</button>
+        <div style={{ marginTop: 16, display: "flex", gap: 16, justifyContent: "center" }}>
+          <a href="/privacy.html" target="_blank" style={{ color: "#555566", fontSize: 11, textDecoration: "none" }}>Gizlilik Politikası</a>
+          <span style={{ color: "#252530" }}>|</span>
+          <a href="mailto:obscurapsy@gmail.com" style={{ color: "#555566", fontSize: 11, textDecoration: "none" }}>İletişim</a>
+        </div>
       </div>
     </div><style>{CSS}</style></div>
   );
