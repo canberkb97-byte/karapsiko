@@ -44,7 +44,8 @@ const SocialLinks = ({ small }) => (
       <a href="https://www.shopier.com/karapsy/44133638" target="_blank" style={{ color: C.accent, fontSize: 11, textDecoration: "none" }}>E-Kitap</a>
     </div>
     <div style={{ display: "flex", gap: 12 }}>
-      <a href="/privacy.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}><a href="/terms.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Kullanım Koşulları</a>
+      <a href="/privacy.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Gizlilik Politikası</a>
+      <a href="/terms.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Kullanım Koşulları</a>
       <a href="/about.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Hakkımızda</a>
     </div>
   </div>
