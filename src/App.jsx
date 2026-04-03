@@ -41,7 +41,7 @@ const SocialLinks = ({ small }) => (
     <div style={{ display: "flex", gap: 16 }}>
       <a href="https://www.tiktok.com/@karapsiko" target="_blank" style={{ color: C.accent, fontSize: 11, textDecoration: "none" }}>TikTok</a>
       <a href="https://www.instagram.com/karapsiko" target="_blank" style={{ color: C.accent, fontSize: 11, textDecoration: "none" }}>Instagram</a>
-      <a href="https://www.shopier.com/karapsy/44133638" target="_blank" style={{ color: C.accent, fontSize: 11, textDecoration: "none" }}>E-Kitap</a>
+
     </div>
     <div style={{ display: "flex", gap: 12 }}>
       <a href="/privacy.html" target="_blank" style={{ color: C.textMuted, fontSize: 10, textDecoration: "none" }}>Gizlilik Politikası</a>
