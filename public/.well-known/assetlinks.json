@@ -1,8 +1,8 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "app.vercel.karapsiko_l3ff.twa",
-        "sha256_cert_fingerprints": ["0F:48:95:B4:E5:0C:3A:62:87:3A:C5:70:D0:99:ED:79:F4:01:02:3E:A7:42:FD:5D:09:A3:3B:21:A0:FA:3E:59"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.karapsiko_l3ff.twa",
+    "sha256_cert_fingerprints": ["B3:52:83:61:81:21:A2:C5:7F:72:5D:6F:F6:26:40:F9:5C:FD:4B:21:7B:1E:B9:19:39:E2:2C:67:B2:18:06:00"]
+  }
+}]
